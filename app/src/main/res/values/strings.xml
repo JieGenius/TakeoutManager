@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">外卖管理端</string>
+    <string name="title_home">主页</string>
+    <string name="title_dashboard">仪表盘</string>
+    <string name="title_notifications">通知</string>
+    <string name="title_user_center">用户中心</string>
+</resources>
