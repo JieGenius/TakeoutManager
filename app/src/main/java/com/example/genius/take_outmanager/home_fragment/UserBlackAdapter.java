@@ -16,7 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.genius.take_outmanager.AllDeliveyBean;
+import com.example.genius.take_outmanager.AllUserBlack;
 import com.example.genius.take_outmanager.R;
 import com.example.genius.take_outmanager.Service;
 
@@ -31,29 +31,26 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class DeliveryInfoAdapter extends RecyclerView.Adapter<DeliveryInfoAdapter.ViewHolder> {
-    private static final String TAG = "DeliveryInfoAdapter";
-    static List<AllDeliveyBean.DeliveryArrBean> list;
+public class UserBlackAdapter extends RecyclerView.Adapter<UserBlackAdapter.ViewHolder> {
+    private static final String TAG = "UserBlackAdapter";
+    public static List<AllUserBlack.UserBlackArrBean> list;
 
-    public DeliveryInfoAdapter(List<AllDeliveyBean.DeliveryArrBean> list) {
+    public UserBlackAdapter(List<AllUserBlack.UserBlackArrBean> list) {
         this.list = list;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.delivery_info_fragment_item,viewGroup,false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.user_shop_delivery_black_fragment_item, viewGroup, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        viewHolder.tv_name.setText(list.get(i).getName());
-        viewHolder.tv_phone.setText(list.get(i).getPhone());
-        viewHolder.tv_grade.setText(list.get(i).getGrade());
-        viewHolder.bt_black.setEnabled(true);
-        viewHolder.bt_del.setEnabled(true);
+        viewHolder.name.setText(list.get(i).getName());
+        viewHolder.phone.setText(list.get(i).getPhone());
     }
 
     @Override
@@ -61,24 +58,19 @@ public class DeliveryInfoAdapter extends RecyclerView.Adapter<DeliveryInfoAdapte
         return list.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView tv_name;
-        TextView tv_phone;
-        TextView tv_grade;
-        Button bt_del;
-        Button bt_black;
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        TextView name;
+        TextView phone;
+        Button remove;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tv_name = itemView.findViewById(R.id.delivery_info_item_name);
-            tv_phone = itemView.findViewById(R.id.delivery_info_item_phone);
-            tv_grade = itemView.findViewById(R.id.delivery_info_item_grade);
-            bt_del = itemView.findViewById(R.id.delivery_info_item_bt_del);
-            bt_black = itemView.findViewById(R.id.delivery_info_item_bt_black);
-            tv_name.setOnClickListener(this);
-            tv_phone.setOnClickListener(this);
-            tv_grade.setOnClickListener(this);
-            bt_del.setOnClickListener(this);
-            bt_black.setOnClickListener(this);
+            name = itemView.findViewById(R.id.common_black_name);
+            phone = itemView.findViewById(R.id.common_black_phone);
+            remove = itemView.findViewById(R.id.common_black_bt_remove);
+            name.setOnClickListener(this);
+            phone.setOnClickListener(this);
+            remove.setOnClickListener(this);
         }
 
         @Override
@@ -86,16 +78,16 @@ public class DeliveryInfoAdapter extends RecyclerView.Adapter<DeliveryInfoAdapte
             final EditText editText;
             AlertDialog.Builder inputDialog;
             switch (v.getId()) {
-                case R.id.delivery_info_item_name:
+                case R.id.common_black_name:
                     editText = new EditText(v.getContext());
-                    editText.setText(tv_name.getText());
+                    editText.setText(name.getText());
                     inputDialog = new AlertDialog.Builder(v.getContext());
                     inputDialog.setTitle("请输入你想要修改的内容").setView(editText);
                     inputDialog.setPositiveButton("确定修改", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             String temp = editText.getText().toString();
-                            String sql = "update 骑手 set D_name = '"+temp+"'where D_num = "+list.get(getLayoutPosition()).getId();
+                            String sql = "update 用户黑名单 set UB_name = '"+temp+"'where UB_num = "+list.get(getLayoutPosition()).getId();
                             list.get(getLayoutPosition()).setName(temp);
                             update(sql,v.getContext());
                         }
@@ -106,16 +98,16 @@ public class DeliveryInfoAdapter extends RecyclerView.Adapter<DeliveryInfoAdapte
                         }
                     }).show();
                     break;
-                case R.id.delivery_info_item_phone:
+                case R.id.common_black_phone:
                     editText = new EditText(v.getContext());
-                    editText.setText(tv_phone.getText());
+                    editText.setText(phone.getText());
                     inputDialog = new AlertDialog.Builder(v.getContext());
                     inputDialog.setTitle("请输入你想要修改的内容").setView(editText);
                     inputDialog.setPositiveButton("确定修改", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             String temp = editText.getText().toString();
-                            String sql = "update 骑手 set D_phonenum = '"+temp+"'where D_num = "+list.get(getLayoutPosition()).getId();
+                            String sql = "update 用户黑名单 set UB_phonenum = '"+temp+"'where UB_num = "+list.get(getLayoutPosition()).getId();
                             list.get(getLayoutPosition()).setPhone(temp);
                             update(sql,v.getContext());
                         }
@@ -126,40 +118,15 @@ public class DeliveryInfoAdapter extends RecyclerView.Adapter<DeliveryInfoAdapte
                         }
                     }).show();
                     break;
-                case R.id.delivery_info_item_grade:
-                    editText = new EditText(v.getContext());
-                    editText.setText(tv_grade.getText());
-                    inputDialog = new AlertDialog.Builder(v.getContext());
-                    inputDialog.setTitle("请输入你想要修改的内容").setView(editText);
-                    inputDialog.setPositiveButton("确定修改", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String temp = editText.getText().toString();
-                            String sql = "update 骑手 set D_grade = '"+temp+"'where D_grade = "+list.get(getLayoutPosition()).getId();
-                            list.get(getLayoutPosition()).setGrade(temp);
-                            update(sql,v.getContext());
-                        }
-                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    }).show();
-                    break;
-                case R.id.delivery_info_item_bt_del:
-                    String sql = "delete from 骑手 where D_num = "+list.get(getLayoutPosition()).getId()+";";
+
+                case R.id.common_black_bt_remove:
+                    String sql = "delete from 用户黑名单 where UB_num = "+list.get(getLayoutPosition()).getId()+";";
                     update(sql,v.getContext());
-                    list.remove(getLayoutPosition());
-                    break;
-                case R.id.delivery_info_item_bt_black:
-                    String temp = "delete from 骑手 where D_num = "+list.get(getLayoutPosition()).getId()+";";
-                    String temp1 =  "insert into 骑手黑名单(DB_phone,DB_name) values ('"+list.get(getLayoutPosition()).getPhone()+"','"
-                            +list.get(getLayoutPosition()).getName()+");";;
-                    update(temp+temp1,v.getContext());
                     list.remove(getLayoutPosition());
                     break;
             }
         }
+
     }
     static void update(String sql, final Context context) {
         /*final ProgressDialog progressDialog = new ProgressDialog(context);

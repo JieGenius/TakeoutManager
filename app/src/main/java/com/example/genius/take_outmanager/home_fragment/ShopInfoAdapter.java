@@ -1,7 +1,9 @@
 package com.example.genius.take_outmanager.home_fragment;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +48,6 @@ public class ShopInfoAdapter extends RecyclerView.Adapter<ShopInfoAdapter.ViewHo
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         AllShopBean.ShopArrBean  shop= shopInfoList.get(i);
@@ -84,7 +86,8 @@ public class ShopInfoAdapter extends RecyclerView.Adapter<ShopInfoAdapter.ViewHo
     }
 
 
-    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
         TextView tv_shopName;
         TextView tv_address;
         TextView tv_phone;
@@ -95,8 +98,9 @@ public class ShopInfoAdapter extends RecyclerView.Adapter<ShopInfoAdapter.ViewHo
         Button bt_deny;
         Button bt_del;
         Button bt_black;
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull final View itemView) {
             super(itemView);
+
             tv_shopName = itemView.findViewById(R.id.shop_info_item_shop_name);
             tv_address = itemView.findViewById(R.id.shop_info_item_shop_address);
             tv_phone = itemView.findViewById(R.id.shop_info_item_shop_phone);
@@ -119,9 +123,98 @@ public class ShopInfoAdapter extends RecyclerView.Adapter<ShopInfoAdapter.ViewHo
             bt_black.setOnClickListener(this);
         }
         @Override
-        public void onClick(View v) {
+        public void onClick(final View v) {
+            final EditText editText;
+            AlertDialog.Builder inputDialog ;
+
             String sql;
             switch (v.getId()){
+                case R.id.shop_info_item_shop_name:
+                    editText = new EditText(v.getContext());
+                    editText.setText(tv_shopName.getText());
+                    inputDialog = new AlertDialog.Builder(v.getContext());
+                    inputDialog.setTitle("请输入你想要修改的内容").setView(editText);
+                    inputDialog.setPositiveButton("确定修改", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String temp = editText.getText().toString();
+                            String sql = "update 商家 set C_name = '"+temp+"'where C_num = "+shopInfoList.get(getLayoutPosition()).getId();
+                            shopInfoList.get(getLayoutPosition()).setName(temp);
+                            update(sql,v.getContext());
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+                    break;
+                case R.id.shop_info_item_shop_address:
+                    editText = new EditText(v.getContext());
+                    editText.setText(tv_address.getText());
+                    inputDialog = new AlertDialog.Builder(v.getContext());
+                    inputDialog.setTitle("请输入你想要修改的内容").setView(editText);
+                    inputDialog.setPositiveButton("确定修改", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String temp = editText.getText().toString();
+                            String sql = "update 商家 set C_address = '"+temp+"'where C_num = "+shopInfoList.get(getLayoutPosition()).getId();
+                            shopInfoList.get(getLayoutPosition()).setAddress(temp);
+                            update(sql,v.getContext());
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+                    break;
+                case R.id.shop_info_item_shop_phone:
+                    editText = new EditText(v.getContext());
+                    editText.setText(tv_phone.getText());
+                    inputDialog = new AlertDialog.Builder(v.getContext());
+                    inputDialog.setTitle("请输入你想要修改的内容").setView(editText);
+                    inputDialog.setPositiveButton("确定修改", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String temp = editText.getText().toString();
+                            String sql = "update 商家 set C_phonenum = '"+temp+"'where C_num = "+shopInfoList.get(getLayoutPosition()).getId();
+                            shopInfoList.get(getLayoutPosition()).setPhone(temp);
+                            update(sql,v.getContext());
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+                    break;
+                case R.id.shop_info_item_shop_time:
+                    editText = new EditText(v.getContext());
+                    editText.setText(tv_time.getText());
+                    inputDialog = new AlertDialog.Builder(v.getContext());
+                    inputDialog.setTitle("请输入你想要修改的内容").setView(editText);
+                    inputDialog.setPositiveButton("确定修改", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String temp = editText.getText().toString();
+                            String sql = "update 商家 set C_time = '"+temp+"'where C_num = "+shopInfoList.get(getLayoutPosition()).getId();
+                            shopInfoList.get(getLayoutPosition()).setTime(temp);
+                            update(sql,v.getContext());
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+                    break;
+                case R.id.shop_info_item_shop_count:
+
+                    break;
+                case R.id.shop_info_item_shop_grade:
+
+                    break;
                 case R.id.shop_info_item_bt_del:
                     bt_del.setEnabled(false);
                     bt_allow.setEnabled(false);
@@ -136,8 +229,9 @@ public class ShopInfoAdapter extends RecyclerView.Adapter<ShopInfoAdapter.ViewHo
                     bt_deny.setEnabled(false);
                     bt_black.setEnabled(false);
                     sql = "delete from  商家  where C_num = "+shopInfoList.get(getLayoutPosition()).getId()+";";
-                    String temp = "insert into 商家黑名单(CB_phone,CB_shop_name) values('"+shopInfoList.get(getLayoutPosition()).getPhone()+"','"
+                    String temp = "insert into 商家黑名单(CB_phonenum,CB_shop_name) values('"+shopInfoList.get(getLayoutPosition()).getPhone()+"','"
                             +shopInfoList.get(getLayoutPosition()).getName()+"');";
+                    Log.e(TAG, "onClick: "+sql+temp );
                     update(sql + temp,v.getContext());
                     shopInfoList.remove(getLayoutPosition());
                     break;
@@ -157,11 +251,11 @@ public class ShopInfoAdapter extends RecyclerView.Adapter<ShopInfoAdapter.ViewHo
                     sql = "update 商家 set C_state = 0  where C_num = "+shopInfoList.get(getLayoutPosition()).getId();
                     update(sql,v.getContext());
                     break;
-                case R.id.shop_info_item_shop_name:
             }
         }
+
     }
-    static void update(String sql, final Context context){
+     void  update(String sql, final Context context){
         /*final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setTitle("数据更新中，请稍后");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -191,7 +285,7 @@ public class ShopInfoAdapter extends RecyclerView.Adapter<ShopInfoAdapter.ViewHo
             }
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-               // Log.e(TAG, "onResponse: "+response.body().string() );
+                // Log.e(TAG, "onResponse: "+response.body().string() );
                 Message message = new Message();
                 message.obj =  response.body().string();
                 message.what = 2;
@@ -199,4 +293,5 @@ public class ShopInfoAdapter extends RecyclerView.Adapter<ShopInfoAdapter.ViewHo
             }
         });
     }
+
 }

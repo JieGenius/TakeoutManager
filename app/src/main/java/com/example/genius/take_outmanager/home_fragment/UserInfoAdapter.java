@@ -1,6 +1,8 @@
 package com.example.genius.take_outmanager.home_fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -10,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,41 +73,101 @@ public class UserInfoAdapter extends RecyclerView.Adapter<UserInfoAdapter.ViewHo
             tv_address = itemView.findViewById(R.id.user_info_item_address);
             bt_del = itemView.findViewById(R.id.user_info_item_bt_del);
             bt_black = itemView.findViewById(R.id.user_info_item_bt_black);
+            tv_name.setOnClickListener(this);
+            tv_phone.setOnClickListener(this);
+            tv_address.setOnClickListener(this);
+            bt_del.setOnClickListener(this);
+            bt_black.setOnClickListener(this);
         }
 
         @Override
-        public void onClick(View v) {
+        public void onClick(final View v) {
             String sql ;
+            final EditText editText;
+            AlertDialog.Builder inputDialog ;
             switch (v.getId()){
                 case R.id.user_info_item_name:
-
+                    editText = new EditText(v.getContext());
+                    editText.setText(tv_name.getText());
+                    inputDialog = new AlertDialog.Builder(v.getContext());
+                    inputDialog.setTitle("请输入你想要修改的内容").setView(editText);
+                    inputDialog.setPositiveButton("确定修改", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String temp = editText.getText().toString();
+                            String sql = "update 用户 set U_name = '"+temp+"'where U_num = "+list.get(getLayoutPosition()).getId();
+                            list.get(getLayoutPosition()).setName(temp);
+                            update(sql,v.getContext());
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
                     break;
                 case R.id.user_info_item_phone:
-
+                    editText = new EditText(v.getContext());
+                    editText.setText(tv_phone.getText());
+                    inputDialog = new AlertDialog.Builder(v.getContext());
+                    inputDialog.setTitle("请输入你想要修改的内容").setView(editText);
+                    inputDialog.setPositiveButton("确定修改", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String temp = editText.getText().toString();
+                            String sql = "update 用户 set U_phonenum = '"+temp+"'where U_num = "+list.get(getLayoutPosition()).getId();
+                            list.get(getLayoutPosition()).setPhone(temp);
+                            update(sql,v.getContext());
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
                     break;
                 case R.id.user_info_item_address:
-
+                    editText = new EditText(v.getContext());
+                    editText.setText(tv_address.getText());
+                    inputDialog = new AlertDialog.Builder(v.getContext());
+                    inputDialog.setTitle("请输入你想要修改的内容").setView(editText);
+                    inputDialog.setPositiveButton("确定修改", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String temp = editText.getText().toString();
+                            String sql = "update 用户 set U_address = '"+temp+"'where U_num = "+list.get(getLayoutPosition()).getId();
+                            list.get(getLayoutPosition()).setAddress(temp);
+                            update(sql,v.getContext());
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
                     break;
                 case R.id.user_info_item_bt_del:
                     sql = "delete from 用户 where U_num = "+list.get(getLayoutPosition()).getId();
+                    list.remove(getLayoutPosition());
+                    bt_del.setEnabled(false);
+                    bt_black.setEnabled(false);
                     update(sql,v.getContext());
                     break;
 
                 case R.id.user_info_item_bt_black:
                     sql = "delete from 用户 where U_num = "+list.get(getLayoutPosition()).getId()+";";
-                    String temp = "insert into 用户黑名单(UB_phone,UB_name) values ('"+list.get(getLayoutPosition()).getPhone()+"','"
-                            +list.get(getLayoutPosition()).getName()+");";
-                    update(sql,v.getContext());
+                    String temp = "insert into 用户黑名单(UB_phonenum,UB_user_name) values ('"+list.get(getLayoutPosition()).getPhone()+"','"
+                            +list.get(getLayoutPosition()).getName()+"');";
+                    list.remove(getLayoutPosition());
+                    bt_del.setEnabled(false);
+                    bt_black.setEnabled(false);
+                    update(temp+sql,v.getContext());
                     break;
             }
         }
     }
-    static void update(String sql, final Context context){
-        /*final ProgressDialog progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle("数据更新中，请稍后");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setCancelable(false);
-        progressDialog.show();*/
+     static void update(String sql, final Context context){
+
         final android.os.Handler handler = new android.os.Handler(){
             @Override
             public void handleMessage(Message msg) {
@@ -117,7 +180,7 @@ public class UserInfoAdapter extends RecyclerView.Adapter<UserInfoAdapter.ViewHo
             }
         };
         String url = Service.updateInfo;
-        OkHttpClient client = new OkHttpClient();
+        final OkHttpClient client = new OkHttpClient();
         MultipartBody.Builder  requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
         requestBody.addFormDataPart("sql",sql);
         final Request request = new Request.Builder().url(url).post(requestBody.build()).tag(context).build();

@@ -15,9 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.genius.take_outmanager.home_fragment.DeliveryBlackAdapter;
+import com.example.genius.take_outmanager.home_fragment.DeliveryBlackFragment;
 import com.example.genius.take_outmanager.home_fragment.DeliveryInfoFragment;
 import com.example.genius.take_outmanager.home_fragment.OrderInfoFragment;
+import com.example.genius.take_outmanager.home_fragment.ShopBlackFragment;
 import com.example.genius.take_outmanager.home_fragment.ShopInfoFragment;
+import com.example.genius.take_outmanager.home_fragment.UserBlackFragment;
 import com.example.genius.take_outmanager.home_fragment.UserInfoFragment;
 import com.google.gson.Gson;
 
@@ -36,16 +40,25 @@ public class HomeFragment extends Fragment {
     private static UserInfoFragment userInfoFragment;
     private static DeliveryInfoFragment deliveryInfoFragment;
     private static OrderInfoFragment orderInfoFragment;
+    private static ShopBlackFragment shopBlackFragment;
+    private static UserBlackFragment userBlackFragment;
+    private static DeliveryBlackFragment deliveryBlackFragment;
     private AllShopBean allShopBean;
     private AllUserBean allUserBean;
     private AllDeliveyBean allDeliveyBean;
     private AllOrderBean allOrderBean;
+    private AllShopBlack allShopBlack;
+    private AllDeliveryBlack allDeliveryBlack;
+    private AllUserBlack allUserBlack;
     private Context context;
     private Handler handler;
     private final int UPDATESHOPDATA = 0x01;
     private final int UPDATEUSERDATA = 0x02;
     private final int UPDATEDELIVERYDATA = 0x03;
     private final int UPDATEORDERYDATA = 0x04;
+    private final int UPDATESHOPBLACKDATA = 0x05;
+    private final int UPDATEUSERBLACKYDATA = 0x06;
+    private final int UPDATEDELIVERYBLACKYDATA = 0x07;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -65,6 +78,14 @@ public class HomeFragment extends Fragment {
                     case UPDATEORDERYDATA:
                         orderInfoFragment.addData(allOrderBean.getOrderArr());
                         break;
+                    case UPDATESHOPBLACKDATA:
+                        shopBlackFragment.addData(allShopBlack.getShopBlackArr());
+                        break;
+                    case UPDATEUSERBLACKYDATA:
+                        userBlackFragment.addData(allUserBlack.getUserBlackArr());
+                        break;
+                    case UPDATEDELIVERYBLACKYDATA:
+                        deliveryBlackFragment.addData(allDeliveryBlack.getDeliveryBlackArr());
 
                 }
             }
@@ -95,6 +116,15 @@ public class HomeFragment extends Fragment {
                     case 3:
                         jumpFragment(orderInfoFragment);
                         break;
+                    case 4:
+                        jumpFragment(shopBlackFragment);
+                        break;
+                    case 5:
+                        jumpFragment(userBlackFragment);
+                        break;
+                    case 6:
+                        jumpFragment(deliveryBlackFragment);
+                        break;
                 }
             }
 
@@ -113,6 +143,9 @@ public class HomeFragment extends Fragment {
         userInfoFragment = new UserInfoFragment();
         deliveryInfoFragment = new DeliveryInfoFragment();
         orderInfoFragment = new OrderInfoFragment();
+        shopBlackFragment = new ShopBlackFragment();
+        userBlackFragment = new UserBlackFragment();
+        deliveryBlackFragment = new DeliveryBlackFragment();
         runOnNewThread();
         jumpFragment(shopInfoFragment);
         return view;
@@ -132,6 +165,9 @@ public class HomeFragment extends Fragment {
                 getAllUser();
                 getAllDelivery();
                 getAllOrder();
+                getShopBlack();
+                getUserBlack();
+                getDeliveryBlack();
             }
         });
         thread.start();
@@ -208,6 +244,60 @@ public class HomeFragment extends Fragment {
             public void onResponse(Call call, Response response) throws IOException {
                 allOrderBean = new Gson().fromJson(response.body().string(),AllOrderBean.class);
                 handler.sendEmptyMessage(UPDATEORDERYDATA);
+            }
+        });
+    }
+    private void getShopBlack(){
+        String url = Service.getShopBlack;
+        OkHttpClient client = new OkHttpClient();
+        //MultipartBody.Builder  requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        Request request = new Request.Builder().url(url).tag(getActivity()).build();
+        client.newBuilder().readTimeout(10,TimeUnit.MINUTES).connectTimeout(10,TimeUnit.MINUTES).writeTimeout(10,TimeUnit.MINUTES)
+                .build().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "onFailure: "+e.getMessage() );
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                allShopBlack = new Gson().fromJson(response.body().string(),AllShopBlack.class);
+                handler.sendEmptyMessage(UPDATESHOPBLACKDATA);
+            }
+        });
+    }
+    private void getUserBlack(){
+        String url = Service.getUserBlack;
+        OkHttpClient client = new OkHttpClient();
+        //MultipartBody.Builder  requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        Request request = new Request.Builder().url(url).tag(getActivity()).build();
+        client.newBuilder().readTimeout(10,TimeUnit.MINUTES).connectTimeout(10,TimeUnit.MINUTES).writeTimeout(10,TimeUnit.MINUTES)
+                .build().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "onFailure: "+e.getMessage() );
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                allUserBlack = new Gson().fromJson(response.body().string(),AllUserBlack.class);
+                handler.sendEmptyMessage(UPDATEUSERBLACKYDATA);
+            }
+        });
+    }
+    private void getDeliveryBlack(){
+        String url = Service.getDeliveryBlack;
+        OkHttpClient client = new OkHttpClient();
+        //MultipartBody.Builder  requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        Request request = new Request.Builder().url(url).tag(getActivity()).build();
+        client.newBuilder().readTimeout(10,TimeUnit.MINUTES).connectTimeout(10,TimeUnit.MINUTES).writeTimeout(10,TimeUnit.MINUTES)
+                .build().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "onFailure: "+e.getMessage() );
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                allDeliveryBlack = new Gson().fromJson(response.body().string(),AllDeliveryBlack.class);
+                handler.sendEmptyMessage(UPDATEDELIVERYBLACKYDATA);
             }
         });
     }
